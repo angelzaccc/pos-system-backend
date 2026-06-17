@@ -26,12 +26,7 @@ public class CategoryController {
 
     @Autowired
     private MenuItemRepository menuItemRepository;
-
-    @GetMapping("/categories")
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
-    }
-
+    
   @GetMapping("/test")
 public String test() {
     return "Backend is working";
