@@ -27,15 +27,15 @@ public class CategoryController {
     @Autowired
     private MenuItemRepository menuItemRepository;
 
-    @GetMapping("/test")
+    @GetMapping("/categories")
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
+
+  @GetMapping("/test")
 public String test() {
     return "Backend is working";
 }
-
-    @GetMapping("/menu-items")
-    public List<MenuItem> getAllMenuItems() {
-        return menuItemRepository.findAll();
-    }
 
     @PostMapping("/categories")
     public Category createCategory(@RequestBody Category category) {
@@ -60,7 +60,7 @@ public String test() {
                     
                     if (file != null && !file.isEmpty()) {
                       
-                        String uploadDir = "src/main/resources/static/assets/icons/";
+                    String uploadDir = "src/main/resources/static/assets/icons/";
                         String fileName = file.getOriginalFilename();
                         
                         if (fileName != null) {
