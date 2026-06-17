@@ -18,7 +18,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "https://pos-system-frontend-git-main-my-project-zacarias.vercel.app")
+// 🚀 Wildcard allows your live Vercel domains to fetch data securely without cors errors
+@CrossOrigin(origins = "*") 
 public class CategoryController {
 
     @Autowired
@@ -27,10 +28,23 @@ public class CategoryController {
     @Autowired
     private MenuItemRepository menuItemRepository;
 
-@GetMapping("/test")
-public String test() {
-    return "Backend is working";
-}
+    // 🚀 Test Route
+    @GetMapping("/test")
+    public String test() {
+        return "Backend is working";
+    }
+
+    // 🚀 RESTORED: Get all categories
+    @GetMapping("/categories")
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
+
+    // 🚀 RESTORED: Get all drink menu items
+    @GetMapping("/menu-items")
+    public List<MenuItem> getAllMenuItems() {
+        return menuItemRepository.findAll();
+    }
 
     @PostMapping("/categories")
     public Category createCategory(@RequestBody Category category) {
@@ -38,12 +52,12 @@ public String test() {
     }
 
     // ==========================================
-    // PUT 
+    // PUT (Update Item)
     // ==========================================
     @PutMapping(value = "/menu-items/{id}", consumes = {"multipart/form-data"})
     public ResponseEntity<MenuItem> updateMenuItem(
             @PathVariable Long id,
-            @RequestPart("item") MenuItem updatedItem, // Binds natively from Angular Content Type Blob
+            @RequestPart("item") MenuItem updatedItem, 
             @RequestPart(value = "file", required = false) MultipartFile file) {
         
         return menuItemRepository.findById(id)
@@ -54,12 +68,13 @@ public String test() {
                     existingItem.setCategoryName(updatedItem.getCategoryName());
                     
                     if (file != null && !file.isEmpty()) {
-                      
-            String uploadDir = "src/main/resources/static/assets/icons/";
+                        // ✨ Clean Cloud-Safe Relative Path
+                        String uploadDir = "src/main/resources/static/assets/icons/";
                         String fileName = file.getOriginalFilename();
                         
                         if (fileName != null) {
                             Path copyLocation = Paths.get(uploadDir + fileName);
+                            Files.createDirectories(copyLocation.getParent()); // Creates folder if missing
                             Files.copy(file.getInputStream(), copyLocation, StandardCopyOption.REPLACE_EXISTING);
                             existingItem.setImageUrl("assets/icons/" + fileName);
                         }
@@ -76,47 +91,49 @@ public String test() {
             .orElse(ResponseEntity.notFound().build());
     }
 
- // =======================================
-// POST 
-// =======================================
-@PostMapping(value = "/menu-items", consumes = {"multipart/form-data"})
-public ResponseEntity<MenuItem> createMenuItem(
-        @RequestParam("name") String name,
-        @RequestParam("price") double price,
-        @RequestParam("categoryId") int categoryId,
-        @RequestParam("categoryName") String categoryName,
-        @RequestPart(value = "file", required = false) MultipartFile file) {
-    try {
-        MenuItem newItem = new MenuItem();
-        newItem.setName(name);
-        newItem.setPrice(price);
-        newItem.setCategoryName(categoryName);
-        newItem.setCategoryId(categoryId);
+    // =======================================
+    // POST (Create Item)
+    // =======================================
+    @PostMapping(value = "/menu-items", consumes = {"multipart/form-data"})
+    public ResponseEntity<MenuItem> createMenuItem(
+            @RequestParam("name") String name,
+            @RequestParam("price") double price,
+            @RequestParam("categoryId") int categoryId,
+            @RequestParam("categoryName") String categoryName,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        try {
+            MenuItem newItem = new MenuItem();
+            newItem.setName(name);
+            newItem.setPrice(price);
+            newItem.setCategoryName(categoryName);
+            newItem.setCategoryId(categoryId);
 
-        if (file != null && !file.isEmpty()) {
-            String uploadDir = "C:/Users/User/Downloads/POS-System/frontend-POS/src/assets/icons/";
-            String fileName = file.getOriginalFilename();
-            
-            if (fileName != null) {
-                Path copyLocation = Paths.get(uploadDir + fileName);
-                Files.copy(file.getInputStream(), copyLocation, StandardCopyOption.REPLACE_EXISTING);
-                newItem.setImageUrl("assets/icons/" + fileName);
+            if (file != null && !file.isEmpty()) {
+                // ✨ FIXED: Removed C:/Users/... absolute local path
+                String uploadDir = "src/main/resources/static/assets/icons/";
+                String fileName = file.getOriginalFilename();
+                
+                if (fileName != null) {
+                    Path copyLocation = Paths.get(uploadDir + fileName);
+                    Files.createDirectories(copyLocation.getParent()); // Creates folder if missing
+                    Files.copy(file.getInputStream(), copyLocation, StandardCopyOption.REPLACE_EXISTING);
+                    newItem.setImageUrl("assets/icons/" + fileName);
+                }
+            } else {
+                newItem.setImageUrl("assets/icons/default.png");
             }
-        } else {
-            newItem.setImageUrl("assets/icons/default.png");
+
+            MenuItem savedItem = menuItemRepository.save(newItem);
+            return ResponseEntity.ok(savedItem);
+
+        } catch (IOException e) {
+            System.err.println("Database entry write failure: " + e.getMessage());
+            return ResponseEntity.status(500).build();
         }
-
-        MenuItem savedItem = menuItemRepository.save(newItem);
-        return ResponseEntity.ok(savedItem);
-
-    } catch (IOException e) {
-        System.err.println("Database entry write failure: " + e.getMessage());
-        return ResponseEntity.status(500).build();
     }
-}
 
     // =======================================
-    //  DELETE 
+    // DELETE (Remove Item)
     // =======================================
     @DeleteMapping("/menu-items/{id}")
     public ResponseEntity<Void> deleteMenuItem(@PathVariable Long id) {
