@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/transactions")
-@CrossOrigin(origins = "http://localhost:4200") 
+@CrossOrigin(origins = "https://pos-system-frontend-git-main-my-project-zacarias.vercel.app")
 public class TransactionController {
 
     @Autowired
