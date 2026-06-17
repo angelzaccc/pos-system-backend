@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:4200") 
+@CrossOrigin(origins = "https://pos-system-frontend-git-main-my-project-zacarias.vercel.app")
 public class CategoryController {
 
     @Autowired
@@ -59,7 +59,8 @@ public class CategoryController {
                     existingItem.setCategoryName(updatedItem.getCategoryName());
                     
                     if (file != null && !file.isEmpty()) {
-                        String uploadDir = "C:/Users/User/Downloads/POS-System/frontend-POS/src/assets/icons/";
+                      
+                        String uploadDir = "src/main/resources/static/assets/icons/";
                         String fileName = file.getOriginalFilename();
                         
                         if (fileName != null) {
