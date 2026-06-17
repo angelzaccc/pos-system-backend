@@ -33,7 +33,7 @@ public class TransactionItem {
     @Column(name = "selected_sugar_level")
     private int selectedSugarLevel;
 
-    // Default Constructor
+
     public TransactionItem() {}
 
     // Getters and Setters
