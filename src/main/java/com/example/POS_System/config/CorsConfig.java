@@ -13,11 +13,13 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**") // 🌟 Applies to all endpoints starting with /api
-                        .allowedOrigins("http://localhost:4200") // 🌟 Allows your Angular dev server
+                registry.addMapping("/api/**") 
+                        // 🚀 Change this to "*" to unlock your live Vercel site!
+                        .allowedOrigins("*") 
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(true);
+                        // ⚠️ NOTE: When using allowedOrigins("*"), allowCredentials MUST be false
+                        .allowCredentials(false); 
             }
         };
     }
